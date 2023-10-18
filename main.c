@@ -3,20 +3,11 @@
 #include <strings.h>
 #include "func.h"
 #include <ctype.h>
+#include "structs.h" //arquivo com as structs grafo, vertice 
+#include "stack.h" //arquivo q tera as funcoes relacionadas a pilha
 
 char comandolimpar[6] = "cls"; // para windows, se for linux mudar isso
-struct Grafo
-{
-    int vertice;
-    int arestasGrafo;
-    int digrafo;
-};
 
-struct Vertice
-{
-    int id;
-    int arestasVertice;
-};
 
 // se mudar o escolher processo de document apaga
 void modificarMatriz(int *matriz, int V0, int V1, int valor, struct Grafo *grafo); // se mudar o escolher processo de document apaga
@@ -52,7 +43,7 @@ int main()
 void modificarMatriz(int *matriz, int V0, int V1, int valor, struct Grafo *grafo)
 {
 
-    if (valor == 0)
+    if (valor == 0)// zerar o valor da aresta é considerado removela
     {
         grafo->arestasGrafo = grafo->arestasGrafo - 1;
     }
@@ -66,7 +57,7 @@ void modificarMatriz(int *matriz, int V0, int V1, int valor, struct Grafo *grafo
 
     *(matriz + j + (i * grafo->vertice)) = valor;
 
-    if (grafo->digrafo != 1)
+    if (grafo->digrafo != 1)// se o grafo nao for um digrafo o mesmo valor sera associado tanto a i->j tanto j->i
     {
         *(matriz + i + (j * grafo->vertice)) = valor;
     }
