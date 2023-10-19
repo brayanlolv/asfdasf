@@ -3,15 +3,14 @@
 #include <strings.h>
 #include "func.h"
 #include <ctype.h>
-#include "structs.h" //arquivo com as structs grafo, vertice 
-#include "stack.h" //arquivo q tera as funcoes relacionadas a pilha
+#include "structs.h" //arquivo com as structs grafo, vertice
+#include "stack.h"   //arquivo q tera as funcoes relacionadas a pilha
 
 char comandolimpar[6] = "cls"; // para windows, se for linux mudar isso
 
-
 // se mudar o escolher processo de document apaga
 void modificarMatriz(int *matriz, int V0, int V1, int valor, struct Grafo *grafo); // se mudar o escolher processo de document apaga
-
+void dfsPilha(int verticeinicial, struct Grafo *grafo, int *matrizAdj);
 void escolherProcesso(int *matriz, int length, struct Grafo grafo);
 void printMatriz(int *matriz, int length, struct Grafo grafo);
 void initMatriz(int *matriz, int length);
@@ -43,7 +42,7 @@ int main()
 void modificarMatriz(int *matriz, int V0, int V1, int valor, struct Grafo *grafo)
 {
 
-    if (valor == 0)// zerar o valor da aresta é considerado removela
+    if (valor == 0) // zerar o valor da aresta é considerado removela
     {
         grafo->arestasGrafo = grafo->arestasGrafo - 1;
     }
@@ -57,7 +56,7 @@ void modificarMatriz(int *matriz, int V0, int V1, int valor, struct Grafo *grafo
 
     *(matriz + j + (i * grafo->vertice)) = valor;
 
-    if (grafo->digrafo != 1)// se o grafo nao for um digrafo o mesmo valor sera associado tanto a i->j tanto j->i
+    if (grafo->digrafo != 1) // se o grafo nao for um digrafo o mesmo valor sera associado tanto a i->j tanto j->i
     {
         *(matriz + i + (j * grafo->vertice)) = valor;
     }
@@ -93,8 +92,14 @@ void escolherProcesso(int *matriz, int length, struct Grafo grafo)
     }
     else if (escolha == 2)
     {
+        static char temp[256];
+        fgets(temp, sizeof(temp), stdin); // limpar o q ficou no buffer
+
+        int verticeInicial;
+        printf("de qual verticevc quer comecaro dfs ? \n\n\n");
+        scanf("&d",&verticeInicial);
         system(comandolimpar);
-        printf("o escolhido foi o 2");
+        dfsPilha(verticeInicial,&grafo,matriz);
     }
     else
     {
@@ -123,4 +128,48 @@ void printMatriz(int *matriz, int length, struct Grafo grafo)
         }
     }
     printf(" \no grafo tem %d vertices e %d arestas", grafo.vertice, grafo.arestasGrafo);
+}
+
+// void execDfs(int verticeinicial, struct Grafo *grafo, int *matrizAdj)
+// {
+//     static char temp[256];
+//     fgets(temp, sizeof(temp), stdin); // limpar o q ficou no buffer
+//     escolherProcesso(matriz, length, grafo);
+
+//     int verticeInicial;
+//     scanf("&d", &verticeInicial);
+//     system(comandolimpar);
+//     dfsPilha(verticeInicial, &grafo, matrizAdj);
+// }
+
+void dfsPilha(int verticeinicial, struct Grafo *grafo, int *matrizAdj)
+{
+    verticeinicial -= 1; // se pah tapvez temja q tirar isso
+
+    int verticesvisitados[grafo->vertice];
+    setarArray(&verticesvisitados[0], grafo->vertice, 0);
+    // verificar se o vertice ja foi visitado
+
+    // criar pilha q vai guardar os vertices visitados
+    struct Pilha *pilha = criarPilha();
+    // empilhar o vertice inicial
+    empilhar(pilha, verticeinicial); // talvez tenh q por um -1 no vertice inicial  !!!!!!
+
+    while (!estaVazia(pilha))
+    { // enquanto estiver vazia
+        int vertice = elementoTopo(pilha);
+        desempilhar(pilha);
+        verticesvisitados[vertice] = 1;
+        printf("%d  ", vertice + 1);
+
+        for (int i = 0; i < grafo->vertice; i++)
+        { // for (auto e : adj) isso é um um map, o e é o elemento, o adj é uum vetor;
+            int elemento = *(matrizAdj + (vertice * grafo->vertice) + i);
+            if (verticesvisitados[i] == 0 && elemento != 0)
+            {
+                empilhar(pilha, i);
+                i = grafo->vertice;
+            }
+        }
+    }
 }
